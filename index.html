@@ -1,90 +1,322 @@
 
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-    <!-- Configuración básica -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Título de la aplicación -->
     <title>Bolivar Eco Calculator</title>
 
-    <!-- Estilos CSS -->
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             font-family: Arial, sans-serif;
-            background-color: #f1f7f2;
-            color: #24352a;
-            min-height: 100vh;
+            background-color: #f2f7f2;
+            margin: 0;
+            padding: 25px;
+            color: #26352b;
         }
 
         header {
-            background-color: #176b45;
-            color: white;
-            padding: 25px;
             text-align: center;
+            margin-bottom: 30px;
         }
 
-        header h1 {
-            font-size: 30px;
+        h1 {
+            color: #176b45;
         }
 
         main {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 30px;
-            background-color: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            max-width: 650px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
         }
 
-        main h2 {
-            color: #176b45;
-            margin-bottom: 15px;
+        .field {
+            margin-bottom: 22px;
         }
 
-        footer {
-            text-align: center;
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 15px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #176b45;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #105536;
+        }
+
+        #results {
+            display: none;
+            margin-top: 25px;
             padding: 20px;
-            color: #647568;
+            background-color: #eaf5ed;
+            border-radius: 8px;
+        }
+
+        .result-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #176b45;
+        }
+
+        .result-item {
+            margin-bottom: 18px;
+        }
+
+        .explanation {
             font-size: 13px;
+            color: #647268;
+            line-height: 1.5;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Encabezado -->
     <header>
         <h1>Bolivar Eco Calculator</h1>
-        <p>Calculadora de sostenibilidad ambiental</p>
+        <p>Calculadora de impacto ambiental y huella de carbono</p>
     </header>
 
-    <!-- Contenido principal -->
     <main>
-        <h2>Welcome to Bolivar Eco Calculator</h2>
 
-        <p>
-            Esta aplicación permite calcular y analizar
-            indicadores relacionados con la sostenibilidad
-            y el impacto ambiental.
-        </p>
+        <h2>Calcula tu impacto ambiental</h2>
 
-        <!-- Aquí se incorporarán las funcionalidades -->
+        <form id="ecoForm">
+
+            <!-- TRANSPORTE -->
+            <div class="field">
+                <label for="transport">
+                    1. ¿Cómo te transportas al colegio?
+                </label>
+
+                <select id="transport" required>
+                    <option value="">Selecciona una opción</option>
+                    <option value="bus">Bus</option>
+                    <option value="private">Carro privado</option>
+                    <option value="shared">Carro compartido</option>
+                    <option value="bike">Bicicleta / Caminando</option>
+                </select>
+            </div>
+
+            <!-- PAPEL -->
+            <div class="field">
+                <label for="paper">
+                    2. ¿Cuántas hojas de papel utilizas al día?
+                </label>
+
+                <input
+                    type="number"
+                    id="paper"
+                    min="0"
+                    max="500"
+                    step="1"
+                    placeholder="Ejemplo: 5"
+                    required
+                >
+            </div>
+
+            <!-- RECICLAJE -->
+            <div class="field">
+                <label for="recycling">
+                    3. ¿Cuál es tu nivel de reciclaje?
+                </label>
+
+                <select id="recycling" required>
+                    <option value="">Selecciona tu nivel</option>
+                    <option value="low">Bajo</option>
+                    <option value="medium">Medio</option>
+                    <option value="high">Alto</option>
+                </select>
+            </div>
+
+            <button type="submit">
+                Calcular mi impacto ambiental
+            </button>
+
+        </form>
+
+        <!-- RESULTADOS -->
+        <section id="results" aria-live="polite">
+
+            <h2>Tu resultado ambiental</h2>
+
+            <div class="result-item">
+                <p>Huella de carbono semanal estimada:</p>
+                <div class="result-number" id="co2Result">
+                    0 kg CO₂
+                </div>
+            </div>
+
+            <div class="result-item">
+                <p>Tu puntuación Eco-Points:</p>
+                <div class="result-number" id="pointsResult">
+                    0 / 100
+                </div>
+            </div>
+
+            <div class="result-item">
+                <h3 id="evaluation"></h3>
+                <p id="message"></p>
+            </div>
+
+            <p class="explanation">
+                Estos resultados son estimaciones educativas basadas
+                en factores de emisión provisionales. Se calculan
+                considerando cinco días escolares por semana.
+            </p>
+
+        </section>
 
     </main>
 
-    <!-- Pie de página -->
-    <footer>
-        <p>© 2026 Colegio Bolívar | Bolivar Eco Calculator</p>
-    </footer>
+    <script>
+        // FACTORES DE EMISIÓN SEMANAL POR TRANSPORTE
+        const transportEmissions = {
+            bus: 6,
+            private: 18,
+            shared: 9,
+            bike: 0
+        };
+
+        // PUNTOS SEGÚN EL MEDIO DE TRANSPORTE
+        const transportPoints = {
+            bus: 35,
+            private: 15,
+            shared: 40,
+            bike: 50
+        };
+
+        // FACTOR DE EMISIÓN POR HOJA DE PAPEL
+        const CO2_PER_SHEET = 0.005;
+
+        // PORCENTAJE DE REDUCCIÓN SEGÚN RECICLAJE
+        const recyclingReduction = {
+            low: 0,
+            medium: 0.10,
+            high: 0.20
+        };
+
+        // PUNTOS SEGÚN EL NIVEL DE RECICLAJE
+        const recyclingPoints = {
+            low: 0,
+            medium: 10,
+            high: 20
+        };
+
+        // FORMULARIO PRINCIPAL
+        const ecoForm = document.getElementById("ecoForm");
+
+        ecoForm.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            // OBTENER LOS DATOS
+            const transport = document.getElementById("transport").value;
+            const paper = Number(document.getElementById("paper").value);
+            const recycling = document.getElementById("recycling").value;
+
+            // VALIDAR LOS DATOS
+            if (
+                !transport ||
+                !recycling ||
+                !Number.isInteger(paper) ||
+                paper < 0 ||
+                paper > 500
+            ) {
+                alert("Por favor, completa todos los campos correctamente.");
+                return;
+            }
+
+            // 1. CALCULAR EMISIONES DEL TRANSPORTE
+            const transportCO2 = transportEmissions[transport];
+
+            // 2. CALCULAR EMISIONES DEL PAPEL
+            const weeklyPaper = paper * 5;
+
+            const paperCO2 =
+                weeklyPaper * CO2_PER_SHEET;
+
+            // 3. APLICAR REDUCCIÓN POR RECICLAJE
+            const reduction = recyclingReduction[recycling];
+
+            const adjustedPaperCO2 =
+                paperCO2 * (1 - reduction);
+
+            // 4. CALCULAR HUELLA TOTAL
+            const totalCO2 =
+                transportCO2 + adjustedPaperCO2;
+
+            // 5. CALCULAR ECO-POINTS POR PAPEL
+            const paperScore = Math.max(
+                0,
+                30 - (paper * 3)
+            );
+
+            // 6. CALCULAR ECO-POINTS TOTALES
+            const totalPoints =
+                transportPoints[transport] +
+                paperScore +
+                recyclingPoints[recycling];
+
+            // 7. MOSTRAR RESULTADOS
+            document.getElementById("co2Result").textContent =
+                totalCO2.toFixed(2) + " kg CO₂";
+
+            document.getElementById("pointsResult").textContent =
+                totalPoints + " / 100";
+
+            // 8. EVALUAR EL RESULTADO
+            const evaluation =
+                document.getElementById("evaluation");
+
+            const message =
+                document.getElementById("message");
+
+            if (totalPoints >= 80) {
+                evaluation.textContent = "¡Excelente trabajo!";
+                message.textContent =
+                    "Tus hábitos son muy sostenibles. ¡Sigue así!";
+            } else if (totalPoints >= 60) {
+                evaluation.textContent = "¡Buen trabajo!";
+                message.textContent =
+                    "Tienes buenos hábitos ambientales, pero todavía puedes mejorar.";
+            } else if (totalPoints >= 40) {
+                evaluation.textContent = "Puedes mejorar.";
+                message.textContent =
+                    "Intenta reducir tu consumo de papel y elegir transportes más sostenibles.";
+            } else {
+                evaluation.textContent = "¡Es hora de actuar!";
+                message.textContent =
+                    "Pequeños cambios en tus hábitos pueden reducir tu impacto ambiental.";
+            }
+
+            // MOSTRAR LA SECCIÓN DE RESULTADOS
+            document.getElementById("results").style.display = "block";
+
+        });
+    </script>
 
 </body>
 </html>
